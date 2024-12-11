@@ -1,29 +1,34 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
-import 'dart:io';
+import 'package:widget_mask/widget_mask.dart';
 
 class HomeViewModel with ChangeNotifier {
-  XFile? image;  // Directly store the image (no need for a getter)
+  XFile? image;
+  bool isLoading = false;
+  String selectedMask = 'assets/images/user_image_frame_1.png';
 
   Future<void> pickCropAndMaskImage(BuildContext context) async {
     try {
-      final pickedImage = await ImagePicker().pickImage(source: ImageSource.gallery);
+      isLoading = true;
+      notifyListeners();
+
+      final pickedImage =
+          await ImagePicker().pickImage(source: ImageSource.gallery);
 
       if (pickedImage != null) {
-        image = pickedImage; // Proceed to crop the image after picking
-
+        image = pickedImage;
         final croppedFile = await ImageCropper().cropImage(
           sourcePath: image!.path,
           uiSettings: _getUiSettings(),
         );
 
         if (croppedFile != null) {
-          image = XFile(croppedFile.path); // Store the cropped image
-          notifyListeners(); // Notify listeners that the image has been updated
-
-          // Show dialog with cropped image
-          _showCroppedImageDialog(context, croppedFile.path);
+          image = XFile(croppedFile.path);
+          notifyListeners();
+          _showMaskSelectionDialog(context, croppedFile.path);
         } else {
           debugPrint("Image cropping was canceled.");
         }
@@ -32,6 +37,9 @@ class HomeViewModel with ChangeNotifier {
       }
     } catch (e) {
       debugPrint("Error during image picking/cropping: $e");
+    } finally {
+      isLoading = false;
+      notifyListeners();
     }
   }
 
@@ -39,36 +47,75 @@ class HomeViewModel with ChangeNotifier {
         AndroidUiSettings(
           toolbarTitle: 'Crop Image',
           toolbarColor: Colors.deepPurple,
-          toolbarWidgetColor: Colors.white, // Adjusted for better visibility
+          toolbarWidgetColor: Colors.white,
           initAspectRatio: CropAspectRatioPreset.original,
           lockAspectRatio: false,
         ),
         IOSUiSettings(
           minimumAspectRatio: 1.0,
           aspectRatioLockEnabled: false,
-          showCancelConfirmationDialog: true,
         ),
       ];
 
-  // Function to show a dialog with the cropped image
-  void _showCroppedImageDialog(BuildContext context, String imagePath) {
+  void _showMaskSelectionDialog(BuildContext context, String imagePath) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Cropped Image'),
-          content: Image.file(
-            File(imagePath), // Display the cropped image from the file
-            fit: BoxFit.cover,
+          title: Text('Select a Mask'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              WidgetMask(
+                blendMode: BlendMode.srcOver,
+                mask: Image.file(File(imagePath), fit: BoxFit.fill),
+                child:
+                    Center(child: Image.asset(selectedMask, fit: BoxFit.cover)),
+              ),
+              SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      selectedMask = 'assets/images/user_image_frame_1.png';
+                      Navigator.of(context).pop();
+                      notifyListeners();
+                    },
+                    child: Image.asset('assets/images/user_image_frame_1.png',
+                        width: 50, height: 50),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      selectedMask = 'assets/images/user_image_frame_2.png';
+                      Navigator.of(context).pop();
+                      notifyListeners();
+                    },
+                    child: Image.asset('assets/images/user_image_frame_2.png',
+                        width: 50, height: 50),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      selectedMask = 'assets/images/user_image_frame_3.png';
+                      Navigator.of(context).pop();
+                      notifyListeners();
+                    },
+                    child: Image.asset('assets/images/user_image_frame_3.png',
+                        width: 50, height: 50),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      selectedMask = 'assets/images/user_image_frame_4.png';
+                      Navigator.of(context).pop();
+                      notifyListeners();
+                    },
+                    child: Image.asset('assets/images/user_image_frame_4.png',
+                        width: 50, height: 50),
+                  ),
+                ],
+              ),
+            ],
           ),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
-              },
-              child: Text('Close'),
-            ),
-          ],
         );
       },
     );

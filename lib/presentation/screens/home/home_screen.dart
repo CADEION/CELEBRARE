@@ -1,6 +1,8 @@
 import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:widget_mask/widget_mask.dart';
 
 import 'home_view_model.dart';
 
@@ -60,12 +62,27 @@ class HomeScreen extends StatelessWidget {
             SizedBox(height: 40),
             homeViewModel.image != null
                 ? Container(
-                    height: 500,
+                    height: 300,
                     width: MediaQuery.of(context).size.width,
-                    child: Image.file(
-                      File(homeViewModel.image!.path),
-                      fit: BoxFit.fill,
-                    ),
+                    child: homeViewModel.selectedMask.isNotEmpty
+                        ? WidgetMask(
+                          childSaveLayer: true,
+                            blendMode: BlendMode.srcATop,
+                            mask: Center(
+                              child:Image.file(
+                              File(homeViewModel.image!.path),
+                              fit: BoxFit.fill,
+                            ),
+                            ),
+                            child: Image.asset(
+                                homeViewModel.selectedMask,
+                                fit: BoxFit.fill,
+                              ),
+                          )
+                        : Image.file(
+                            File(homeViewModel.image!.path),
+                            fit: BoxFit.fill,
+                          ),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.all(Radius.circular(10)),
                     ),

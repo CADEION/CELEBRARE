@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:mceleb/presentation/screens/home/home_screen.dart';
+import 'package:mceleb/presentation/screens/splash/spalsh_screen.dart';
 import 'package:provider/provider.dart';
 
 import 'presentation/screens/home/home_view_model.dart';
@@ -22,7 +23,7 @@ class MyApp extends StatelessWidget {
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
           useMaterial3: true,
         ),
-        home: const HomeScreen(),
+        home:  SplashScreen(),
       ),
     );
   }
