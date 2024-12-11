@@ -44,7 +44,7 @@ class HomeScreen extends StatelessWidget {
                         borderRadius: BorderRadius.all(Radius.circular(5)),
                       ),
                     ),
-                    onPressed: homeViewModel.pickAndCropImage,
+                    onPressed: () => homeViewModel.pickCropAndMaskImage(context),
                     child: Text(
                       "Choose From Device",
                       style: TextStyle(
